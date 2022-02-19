@@ -9,7 +9,9 @@ import csv
 import pandas as pd
 import shutil
 import matplotlib.pyplot as plt
+import os
 
+imUrl = ['G:', 'tesina', 'Licencias']
 path = "G:\\tesina\\Licencias\\CASME2-coding-20190701.xlsx"
 df = pd.read_excel(path)
 print(df)
@@ -23,9 +25,6 @@ myFile2 = open('val_data.csv', 'w')
 writer2 = csv.DictWriter(myFile2, fieldnames=labels, lineterminator='\n')
 
 allEmotions = ['happiness', 'disgust', 'surprise']
-positive = ['happiness']
-negative = ['disgust']
-other = ['surprise']
 emotionCount = {'happiness': 0, 'disgust': 0, 'surprise': 0}
 emotionAddedCount = {'happiness': 0, 'disgust': 0, 'surprise': 0}
 
@@ -55,15 +54,20 @@ for i in df.index:
     emo = df['Estimated Emotion'][i]
     if allEmotions.count(emo) > 0:
         if emotionAddedCount[emo] < emotionCount[emo]:
-            shutil.copytree('G:\\tesina\\Licencias\\Cropped\\' + str(df['Subject'][i]) + '\\' + str(df['Filename'][i]),
-                            'G:\\tesina\\Licencias\\MicroExpressions_Data2\\train\\'+emo+'\\' + str(
-                                df['Subject'][i]) + '\\' + df['Filename'][i])
+            # shutil.copytree(imUrl+'Cropped\\' + str(df['Subject'][i]) + '\\' + str(df['Filename'][i]),
+            #                 imUrl+'MicroExpressions_Data2\\train\\'+emo+'\\' + str(
+            #                     df['Subject'][i]) + '\\' + df['Filename'][i])
+            shutil.copytree(os.path.join(*imUrl+['Cropped', str(df['Subject'][i]), str(df['Filename'][i])]),
+                            os.path.join(*imUrl+['MicroExpressions_Data2', 'train', emo, str(df['Subject'][i]), str(df['Filename'][i])]))
             writer.writerow({'Emotion': emo, 'Subject': str(df['Subject'][i]), 'ME_Number': str(df['Filename'][i])})
             emotionAddedCount[emo] += 1
         else:
-            shutil.copytree('G:\\tesina\\Licencias\\Cropped\\' + str(df['Subject'][i]) + '\\' + str(df['Filename'][i]),
-                            'G:\\tesina\\Licencias\\MicroExpressions_Data2\\val\\'+emo+'\\' + str(
-                                df['Subject'][i]) + '\\' + df['Filename'][i])
+            shutil.copytree(os.path.join(*imUrl + ['Cropped', str(df['Subject'][i]), str(df['Filename'][i])]),
+                            os.path.join(
+                                *imUrl + ['MicroExpressions_Data2', 'val', emo, str(df['Subject'][i]), str(df['Filename'][i])]))
+            # shutil.copytree(imUrl+'Cropped\\' + str(df['Subject'][i]) + '\\' + str(df['Filename'][i]),
+            #                 imUrl+'\\MicroExpressions_Data2\\val\\'+emo+'\\' + str(
+            #                     df['Subject'][i]) + '\\' + df['Filename'][i])
             writer2.writerow(
                 {'Emotion': emo, 'Subject': str(df['Subject'][i]), 'ME_Number': str(df['Filename'][i])})
 
