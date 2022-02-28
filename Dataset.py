@@ -10,6 +10,18 @@ import pandas as pd
 import shutil
 import matplotlib.pyplot as plt
 import os
+import pathlib
+
+
+def interpolacion(onset, apex, offset, path):
+    for i in range(onset, offset):
+        initial_count = 0
+        for path2 in pathlib.Path(path).iterdir():
+            if path2.is_file():
+                initial_count += 1
+        if i != apex and i != offset and i != onset and initial_count > 3:
+            os.remove(path + '/reg_img'+str(i)+'.jpg')
+
 
 imUrl = ['G:', 'tesina', 'Licencias']
 path = "G:\\tesina\\Licencias\\CASME2-coding-20190701.xlsx"
@@ -59,12 +71,16 @@ for i in df.index:
             #                     df['Subject'][i]) + '\\' + df['Filename'][i])
             shutil.copytree(os.path.join(*imUrl+['Cropped', str(df['Subject'][i]), str(df['Filename'][i])]),
                             os.path.join(*imUrl+['MicroExpressions_Data2', 'train', emo, str(df['Subject'][i]), str(df['Filename'][i])]))
+            interpolacion(onset=df['OnsetFrame'][i],apex=df['ApexFrame'][i],
+                          offset=df['OffsetFrame'][i],path=os.path.join(*imUrl+['MicroExpressions_Data2', 'train', emo, str(df['Subject'][i]), str(df['Filename'][i])]))
             writer.writerow({'Emotion': emo, 'Subject': str(df['Subject'][i]), 'ME_Number': str(df['Filename'][i])})
             emotionAddedCount[emo] += 1
         else:
             shutil.copytree(os.path.join(*imUrl + ['Cropped', str(df['Subject'][i]), str(df['Filename'][i])]),
                             os.path.join(
                                 *imUrl + ['MicroExpressions_Data2', 'val', emo, str(df['Subject'][i]), str(df['Filename'][i])]))
+            interpolacion(onset=df['OnsetFrame'][i],apex=df['ApexFrame'][i],
+                          offset=df['OffsetFrame'][i],path=os.path.join(*imUrl+['MicroExpressions_Data2', 'val', emo, str(df['Subject'][i]), str(df['Filename'][i])]))
             # shutil.copytree(imUrl+'Cropped\\' + str(df['Subject'][i]) + '\\' + str(df['Filename'][i]),
             #                 imUrl+'\\MicroExpressions_Data2\\val\\'+emo+'\\' + str(
             #                     df['Subject'][i]) + '\\' + df['Filename'][i])
